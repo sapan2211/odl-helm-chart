@@ -1,0 +1,36 @@
+# Default values for odl.
+# This is a YAML-formatted file.
+# Declare name/values to be passed into your templates.
+# name: value
+
+
+images:
+  tags:
+    odl: docker.io/sapan2211/odl-karaf-boron:full
+  pull_policy: "IfNotPresent"
+
+labels:
+  odl:
+      node_selector_key: opendaylight
+      node_selector_value: enabled
+pod:
+  lifecycle:
+    upgrades:
+      daemonsets:
+        pod_replacement_strategy: RollingUpdate
+        odl:
+          enabled: false
+          min_ready_seconds: 0
+          max_unavailable: 1
+  resources:
+    enabled: false
+    odl:
+      requests:
+        memory: "256Mi"
+        cpu: "200m"
+      limits:
+        memory: "1024Mi"
+        cpu: "2000m"
+manifests:
+  configmap_bin: true
+  daemonset_ovs_db: true
