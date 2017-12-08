@@ -9,28 +9,67 @@ images:
     odl: docker.io/sapan2211/odl-karaf-boron:full
   pull_policy: "IfNotPresent"
 
+network:
+  node_port:
+    enabled: false
+    manager: 6640
+    controller1: 6653
+    odl_neutron_rest: 8080
+  cluster_ip:
+    enabled: true
+    manager: 6640
+    controller1: 6653
+    controller2: 6633
+    odl_neutron_rest: 8080
+    dashboard: 8181
+  port:
+    manager: 6640
+    controller1: 6653
+    controller2: 6633
+    odl_neutron_rest: 8080
+    dashboard: 8181
+
 labels:
-  odl:
-      node_selector_key: opendaylight
-      node_selector_value: enabled
 pod:
+  replicas:
+    controller: 1
+  mounts:
+    odl:
+      init_container: null
   lifecycle:
     upgrades:
-      daemonsets:
+      deployments:
+        revision_history: 3
         pod_replacement_strategy: RollingUpdate
+        rolling_update:
+          max_unavailable: 1
+          max_surge: 3
         odl:
           enabled: false
           min_ready_seconds: 0
           max_unavailable: 1
   resources:
-    enabled: false
-    odl:
+    enabled: true
+    controller:
       requests:
-        memory: "256Mi"
-        cpu: "200m"
+        memory: "2048Mi"
+        cpu: "1000m"
       limits:
-        memory: "1024Mi"
+        memory: "4096Mi"
         cpu: "2000m"
 manifests:
-  configmap_bin: true
-  daemonset_ovs_db: true
+  deployment: true
+  service: true
+
+endpoints:
+  odl:
+    name: odl
+    hosts:
+      default: odl
+      public: odl
+    host_fqdn_override:
+      default: null
+    path:
+      default: null
+    scheme:
+      default: http
